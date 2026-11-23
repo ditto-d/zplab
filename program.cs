@@ -13,8 +13,31 @@ await File.WriteAllTextAsync(filePath, zpl);
 Console.WriteLine("Label created successfully");
 Console.WriteLine($"Asset ID: {assetId}");
 Console.WriteLine($"Saved to: {filePath}");
-Console.WriteLine();
-Console.WriteLine(zpl);
-Console.WriteLine("No print job sent");
 
+bool printEnabled=Environment.GetEnvironmentVariable("PRINT_ENABLED") == "true";
 
+if (!printEnabled)
+{
+    Console.Write("Print mode disabled");
+    return;
+}
+
+string? printerIp= Environment.GetEnvironmentVariable("PRINTER_IP");
+
+if (string.IsNullOrEmpty(printerIp))
+{
+    Console.WriteLine("Printer mode enabled, but IP is missing");
+    return;
+}
+
+try
+{
+    Console.WriteLine($"Connecting to printer at {printerIp}:9100...");
+    await TcpZplPrinter.SendAsync(printerIp, 9100, zpl);
+    
+    Console.WriteLine("ZPL data sent to printer");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Print failed: {ex.Message}");
+}
