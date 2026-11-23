@@ -8,8 +8,11 @@ public static class TcpZplPrinter
         int port,
         string zpl)
     {
-        using var timeout = new CancellationTokenSource(
-            TimeSpan.FromSeconds(10));
+	if (string.IsNullOrWhiteSpace(printerIp)) throw new ArgumentException("printer ip can't be empty");
+
+	if (string.IsNullOrWhiteSpace(zpl)) throw new ArgumentException("zpl string can't be empty");
+        
+	using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         
         using var client =new TcpClient();
         
